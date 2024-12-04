@@ -201,6 +201,67 @@ Transform:
   m_Children: []
   m_Father: {fileID: 860039664}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &554007633
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 668137621032320464, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_Name
+      value: Fires
+      objectReference: {fileID: 0}
+    - target: {fileID: 668137621032320464, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.459
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2219289212705504270, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: abf656d6e6688ae45a2179ab1d845b2b, type: 3}
 --- !u!1001 &615539940
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1572,7 +1633,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &621270341
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1600,7 +1661,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.016666668
+  m_VoxelSize: 0.06666667
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 14a90056cde9c2f4e8528d6e1f49d47d, type: 2}
   m_BuildHeightMesh: 0
@@ -3033,6 +3094,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetPlayer: {fileID: 1862889168}
   _headTracking: {fileID: 0}
+  _mouthTr: {fileID: 0}
   _agent: {fileID: 1083261271}
   _animator: {fileID: 615540007}
   _state: 0
@@ -3322,7 +3384,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1711925249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3337,6 +3399,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _headTr: {fileID: 329117591}
   _target: {fileID: 1862889168}
+  _rigBuilder: {fileID: 0}
   _headConstraint: {fileID: 1506125574}
   _correctionAngle: {x: 0, y: 0, z: 0}
   _minHorizontalAngle: -100
@@ -3409,6 +3472,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetPlayer: {fileID: 1862889168}
   _headTracking: {fileID: 1711925249}
+  _mouthTr: {fileID: 0}
   _agent: {fileID: 1711925253}
   _animator: {fileID: 1944306103}
   _state: 0
@@ -3879,3 +3943,4 @@ SceneRoots:
   - {fileID: 621270342}
   - {fileID: 1862889168}
   - {fileID: 1711925254}
+  - {fileID: 554007633}

@@ -9,7 +9,7 @@ public class SamplePetExperience : MonoBehaviour
     bool _roomReady = false;
 
     // build the nav mesh when Scene is detected
-    public NavMeshSurface _ground;
+    //public NavMeshSurface _ground;
     public NavMeshAgent _agent;
 
     // the point on the ground where your controller points
@@ -26,7 +26,7 @@ public class SamplePetExperience : MonoBehaviour
 
     void InitializeRoom()
     {
-        _ground.BuildNavMesh();
+       // _ground.BuildNavMesh();
         _roomReady = true;
     }
 
