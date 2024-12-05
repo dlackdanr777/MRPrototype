@@ -20,13 +20,24 @@ public class ChapterManager : MonoBehaviour
     [SerializeField] private Dog _dog;
     [SerializeField] private GameObject _cat;
     [SerializeField] private Fire _fire;
+    [SerializeField] private GameObject _fireExtinguisher;
     [SerializeField] private GameObject _man;
     [SerializeField] private GrabObject _grabObject;
 
     private Chapter _chapter;
+    private MRUKRoom _room;
 
+    private void Start()
+    {
+        _fire.gameObject.SetActive(false);
+        _man.gameObject.SetActive(false);
+        _fireExtinguisher.gameObject.SetActive(false);
+        _grabGun.gameObject.SetActive(false);
+        _dog.gameObject.SetActive(false);
+        _cat.gameObject.SetActive(false);
+        _grabObject.gameObject.SetActive(false);
+    }
 
-   
 
     public void ResetChapter()
     {
@@ -92,6 +103,7 @@ public class ChapterManager : MonoBehaviour
         _grabObject.gameObject.SetActive(false);
         _fire.gameObject.SetActive(false);
         _man.gameObject.SetActive(false);
+        _fireExtinguisher.gameObject.SetActive(false);
         _dog.transform.position = spawnPos;
         //_cat.transform.position = spawnPos;
         _grabObject.transform.position = spawnPos + Vector3.up;
@@ -113,13 +125,14 @@ public class ChapterManager : MonoBehaviour
     {
         _fire.gameObject.SetActive(true);
         _man.gameObject.SetActive(true);
+        _fireExtinguisher.gameObject.SetActive(true);
         _grabGun.gameObject.SetActive(false);
         _dog.gameObject.SetActive(false);
         _cat.gameObject.SetActive(false);
         _grabObject.gameObject.SetActive(false);
 
         _fire.transform.position = SearchFirePos();
-
+        _fireExtinguisher.transform.position = GetFloorCenterPos();
         Vector3 dir = _fire.transform.position - _man.transform.position;
         dir.y = 0;
 
@@ -146,10 +159,21 @@ public class ChapterManager : MonoBehaviour
     }
 
 
+    private Vector3 GetFloorCenterPos()
+    {
+        if (_room == null)
+            _room = FindAnyObjectByType<MRUKRoom>();
+
+
+        var floorAnchor = _room.FloorAnchor;
+        return _room.FloorAnchor.transform.position;
+    }
+
     private Vector3 SearchFirePos()
     {
-        MRUKRoom room = FindAnyObjectByType<MRUKRoom>();
-        var floorAnchor = room.FloorAnchor;
+        if(_room == null)
+            _room = FindAnyObjectByType<MRUKRoom>();
+        var floorAnchor = _room.FloorAnchor;
 
         if (floorAnchor != null && floorAnchor.PlaneBoundary2D != null)
         {
