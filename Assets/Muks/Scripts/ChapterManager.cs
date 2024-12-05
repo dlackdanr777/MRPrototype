@@ -130,9 +130,8 @@ public class ChapterManager : MonoBehaviour
         _dog.gameObject.SetActive(false);
         _cat.gameObject.SetActive(false);
         _grabObject.gameObject.SetActive(false);
-
+        _man.transform.position = GetFloorCenterPos();
         _fire.transform.position = SearchFirePos();
-        _fireExtinguisher.transform.position = GetFloorCenterPos();
         Vector3 dir = _fire.transform.position - _man.transform.position;
         dir.y = 0;
 

@@ -46,6 +46,18 @@ public class GrabGun : MonoBehaviour
         _onTriggerSource.Stop();
     }
 
+
+    private void OnEnable()
+    {
+        _effect.gameObject.SetActive(false);
+        _onTriggerSource.Stop();
+        _wasTriggerPressed = false;
+        _isHold = false;
+        _lastThrowTime = -Mathf.Infinity;
+        _targetGrabObject = null;
+    }
+
+
     private void Update()
     {
         bool isTriggerPressed = IsTriggerPressed();

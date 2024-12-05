@@ -6,12 +6,15 @@ public class Fire : MonoBehaviour
 {
     [SerializeField] private bool _drawGizoms;
     [SerializeField] private GameObject[] _fires;
+    [SerializeField] private AudioSource _fireSound;
     [SerializeField] private Vector3 _size;
     public Vector3 Size => _size;
-    [Range(1f, 100f)] [SerializeField] private int _maxGauge;
+    [Range(1f, 10f)] [SerializeField] private int _maxGauge;
 
 
-    private int _currentGauge;
+    private float _currentGauge;
+
+
     public void Init()
     {
         _currentGauge = _maxGauge;
@@ -19,19 +22,20 @@ public class Fire : MonoBehaviour
         {
             _fires[i].gameObject.SetActive(true);
         }
+        _fireSound.volume = 1f;
     }
 
 
-    public void PutOutTheFire()
+    public void PutOutTheFire(float value)
     {
         if (_currentGauge <= 0)
             return;
 
-        _currentGauge--;
+        _currentGauge -= value;
         int fireCount = _fires.Length;
         int gaugePerFire = _maxGauge / fireCount;
-
-        for(int i = 0; i < fireCount; ++i)
+        _fireSound.volume = _currentGauge <= 0 ? 0 : _currentGauge / _maxGauge;
+        for (int i = 0; i < fireCount; ++i)
         {
             if(_currentGauge <= i * gaugePerFire)
             {
