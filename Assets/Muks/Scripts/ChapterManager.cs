@@ -105,7 +105,7 @@ public class ChapterManager : MonoBehaviour
         _man.gameObject.SetActive(false);
         _fireExtinguisher.gameObject.SetActive(false);
         _dog.transform.position = spawnPos;
-        //_cat.transform.position = spawnPos;
+        _cat.transform.position = spawnPos;
         _grabObject.transform.position = spawnPos + Vector3.up;
         _grabObject.Rigidbody.isKinematic = false;
         _grabObject.Rigidbody.useGravity = true;
@@ -116,7 +116,7 @@ public class ChapterManager : MonoBehaviour
         _dog.SetTargetGrabObject(null);
         _dog.ChangeState(AnimalState.Idle);
         _dog.gameObject.SetActive(true);
-        _cat.gameObject.SetActive(false);
+        _cat.gameObject.SetActive(true);
         _grabObject.gameObject.SetActive(true);
     }
 
@@ -132,6 +132,7 @@ public class ChapterManager : MonoBehaviour
         _grabObject.gameObject.SetActive(false);
         _man.transform.position = GetFloorCenterPos();
         _fire.transform.position = SearchFirePos();
+        _fire.SetFire();
         Vector3 dir = _fire.transform.position - _man.transform.position;
         dir.y = 0;
 
@@ -170,7 +171,7 @@ public class ChapterManager : MonoBehaviour
 
     private Vector3 SearchFirePos()
     {
-        if(_room == null)
+        if (_room == null)
             _room = FindAnyObjectByType<MRUKRoom>();
         var floorAnchor = _room.FloorAnchor;
 
@@ -212,5 +213,77 @@ public class ChapterManager : MonoBehaviour
         }
 
         return GetSpawnPos();
+    }
+
+
+    public Vector3 SearchRandomFloorPos()
+    {
+        if (_room == null)
+            _room = FindAnyObjectByType<MRUKRoom>();
+
+        var floorAnchor = _room.FloorAnchor;
+
+        if (floorAnchor != null && floorAnchor.PlaneBoundary2D != null)
+        {
+            List<Vector2> planeBoundary = floorAnchor.PlaneBoundary2D;
+
+            if (planeBoundary != null && planeBoundary.Count > 0)
+            {
+                // 다각형을 삼각형으로 분할
+                List<int> triangles = new List<int>();
+                TriangulatePolygon(planeBoundary, triangles);
+
+                // 삼각형 선택
+                int randomTriangleIndex = UnityEngine.Random.Range(0, triangles.Count / 3);
+                Vector2 v0 = planeBoundary[triangles[randomTriangleIndex * 3]];
+                Vector2 v1 = planeBoundary[triangles[randomTriangleIndex * 3 + 1]];
+                Vector2 v2 = planeBoundary[triangles[randomTriangleIndex * 3 + 2]];
+
+                // 삼각형 내부 랜덤 점 계산
+                Vector2 randomPoint2D = GetRandomPointInTriangle(v0, v1, v2);
+
+                // Local 좌표에서 World 좌표로 변환
+                Vector3 localRandomPoint = new Vector3(randomPoint2D.x, 0, randomPoint2D.y);
+                Vector3 anchorPosition = floorAnchor.transform.position;
+                Quaternion anchorRotation = floorAnchor.transform.rotation;
+                Vector3 worldRandomPoint = anchorPosition + anchorRotation * localRandomPoint;
+                return worldRandomPoint;
+            }
+            else
+            {
+                Debug.LogWarning("Plane boundary is empty.");
+            }
+        }
+        else
+        {
+            Debug.LogError("FloorAnchor or PlaneBoundary2D is null.");
+        }
+
+        return GetSpawnPos();
+    }
+
+    // 삼각형 내부 랜덤 점 생성
+    private Vector2 GetRandomPointInTriangle(Vector2 v0, Vector2 v1, Vector2 v2)
+    {
+        float r1 = Mathf.Sqrt(UnityEngine.Random.value);
+        float r2 = UnityEngine.Random.value;
+
+        float a = 1 - r1;
+        float b = r1 * (1 - r2);
+        float c = r1 * r2;
+
+        return a * v0 + b * v1 + c * v2;
+    }
+
+    // 다각형을 삼각형으로 분할
+    private void TriangulatePolygon(List<Vector2> vertices, List<int> triangles)
+    {
+        // UnityEngine.U2D.PolygonUtility 또는 외부 라이브러리를 사용할 수도 있음
+        for (int i = 1; i < vertices.Count - 1; i++)
+        {
+            triangles.Add(0);
+            triangles.Add(i);
+            triangles.Add(i + 1);
+        }
     }
 }

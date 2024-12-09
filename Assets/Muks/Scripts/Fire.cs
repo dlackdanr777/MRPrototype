@@ -15,7 +15,7 @@ public class Fire : MonoBehaviour
     private float _currentGauge;
 
 
-    public void Init()
+    public void SetFire()
     {
         _currentGauge = _maxGauge;
         for(int i = 0, cnt =  _fires.Length; i < cnt; ++i)
@@ -46,7 +46,7 @@ public class Fire : MonoBehaviour
 
     private void Awake()
     {
-        Init();
+        SetFire();
     }
 
 

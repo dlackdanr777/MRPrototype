@@ -1,4 +1,3 @@
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
@@ -62,6 +61,7 @@ public class HeadTracking : MonoBehaviour
     public void SetEnabled(bool isEnabled)
     {
         _isEnabled = isEnabled;
+        Debug.Log(gameObject.name + _isEnabled);
     }
 
     public void SetTarget(Transform target)

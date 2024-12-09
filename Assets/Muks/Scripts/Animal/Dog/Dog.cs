@@ -7,6 +7,7 @@ public enum AnimalState
 {
     Idle,
     Sit,
+    Touch,
     TrackingObject,
     CollectObject,
     Length,

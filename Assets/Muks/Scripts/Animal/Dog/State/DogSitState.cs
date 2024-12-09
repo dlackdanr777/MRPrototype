@@ -39,7 +39,7 @@ public class DogSitState : DogState
     {
         if (other.tag == "Hand")
         {
-            _dog.ChangeState(AnimalState.Sit);
+            _dog.ChangeState(AnimalState.Touch);
         }
     }
 

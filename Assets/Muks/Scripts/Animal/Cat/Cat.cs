@@ -1,98 +1,161 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Cat : MonoBehaviour
 {
-    [Header("Components")]
-    [SerializeField] private NavMeshAgent _agent;
-    [SerializeField] private Rigidbody _rigidBody;
-    [SerializeField] private Transform _headTr;
+    public event Action<AnimalState> OnStateChangeHandler;
+    public event Action<Collider> OnTriggerEnterHandler;
+    public event Action<Collider> OnTriggerEixtHandler;
 
+    [Header("Components")]
+    [SerializeField] private Transform _headTarget;
+    public Transform HeadTarget => _headTarget;
+
+    [SerializeField] private NavMeshAgent _agent;
+    [SerializeField] private ChapterManager _chapterManager;
+    [SerializeField] private Animator _animator;
+    public Animator Animator => _animator;
+
+/*    [SerializeField] private HeadTracking _headTracking;
+    public HeadTracking HeadTracking => _headTracking;*/
 
     [SerializeField] private float _speed;
-    [SerializeField] private float _rotateSpeed;
 
 
-    private int _lastDirection = 0; // -1: 왼쪽, 1: 오른쪽, 0: 초기값
+    private Coroutine _searchPosCoroutine;
+    private Vector3 _targetPos;
+    private AnimalState _state;
+    private CatStateMachine _stateMachine;
+
+
+    private void Start()
+    {
+        _stateMachine = new CatStateMachine(this);
+        _targetPos = transform.position;
+        ChangeState(AnimalState.Idle);
+    }
+
+    private void OnEnable()
+    {
+        _targetPos = transform.position;
+
+        if (_searchPosCoroutine != null)
+            StopCoroutine(_searchPosCoroutine);
+
+        _searchPosCoroutine = StartCoroutine(SearchRandomFloorPosRoutine());
+    }
+
+
 
     private void Update()
     {
-        MoveFoward();
+        _stateMachine.OnUpdate();
     }
 
-    public void MoveFoward()
+    private void FixedUpdate()
     {
-        Vector3 targetPosition = _rigidBody.position + transform.forward * _speed * Time.deltaTime;
-        _rigidBody.MovePosition(targetPosition);
-        CheckForObstacles();
-    }
-
-    public void MoveBackward()
-    {
-        Vector3 targetPosition = _rigidBody.position - transform.forward * _speed * Time.deltaTime * 2;
-        _rigidBody.MovePosition(targetPosition);
-    }
-
-    public void Rotate(float angle)
-    {
-        Quaternion targetRotation = Quaternion.Euler(0, angle, 0) * transform.rotation;
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, _rotateSpeed * Time.deltaTime);
+        _stateMachine.OnFixedUpdate();
     }
 
 
-    private void CheckForObstacles()
+    public void ChangeState(AnimalState state)
     {
-        float boxDistance = 1f; // BoxCast 길이
-        Vector3 boxSize = new Vector3(0.2f, 0.1f, 0.4f); // BoxCast 크기 (반지름)
+        if (_state == state)
+            return;
 
-        // 방향 정의
-        Vector3 forward = transform.forward;
-        Vector3 left = -transform.right;
-        Vector3 right = transform.right;
+        _state = state;
+        _animator.SetInteger("State", (int)_state);
+        OnStateChangeHandler?.Invoke(state);
+    }
 
-        // BoxCast 발사
-        bool isFrontBlocked = Physics.BoxCast(_headTr.position, boxSize, forward, Quaternion.identity, boxDistance);
-        bool isLeftBlocked = Physics.BoxCast(_headTr.position, boxSize, left, Quaternion.identity, boxDistance);
-        bool isRightBlocked = Physics.BoxCast(_headTr.position, boxSize, right, Quaternion.identity, boxDistance);
+    public void Tracking()
+    {
+        if (!_agent.enabled)
+            return;
 
-        // 시각적 디버그
-        Debug.DrawRay(_headTr.position, forward * boxDistance, isFrontBlocked ? Color.red : Color.green);
-        Debug.DrawRay(_headTr.position, left * boxDistance, isLeftBlocked ? Color.red : Color.green);
-        Debug.DrawRay(_headTr.position, right * boxDistance, isRightBlocked ? Color.red : Color.green);
+        if (!_agent.isOnNavMesh)
+            return;
 
-        // 행동 결정
-        if (isFrontBlocked)
+        Debug.Log("이동중 고양이");
+        // 현재 속도와 목표 방향 계산
+        Vector3 directionToTarget = (_targetPos - _agent.transform.position).normalized;
+        Vector3 currentVelocity = _agent.velocity;
+
+        // 현재 속도가 목표 방향과 동일하면 1, 반대 방향이면 -1
+        float forwardDot = Vector3.Dot(currentVelocity.normalized, directionToTarget);
+
+        // 속도의 크기를 기반으로 정규화
+        float currentSpeedNormalized = Mathf.Clamp(currentVelocity.magnitude / _agent.speed, 0, 1);
+
+        // 방향에 따라 값 부호 변경
+        currentSpeedNormalized *= Mathf.Sign(forwardDot);
+
+        // 애니메이터에 값 설정
+        _animator.SetFloat("Speed", currentSpeedNormalized);
+
+        // 목표 위치 설정
+        _agent.SetDestination(_targetPos);
+    }
+
+    public bool IsReachedDestination()
+    {
+        if (!_agent.enabled)
         {
-            if(!isLeftBlocked && !isRightBlocked)
-            {
-                // 전방 막힘 & 양옆 모두 비어 있는 경우
-                if (_lastDirection == 0) // 초기 상태일 경우 랜덤으로 방향 설정
-                {
-                    _lastDirection = Random.Range(0, 2) == 0 ? -1 : 1;
-                }
+            Debug.LogWarning("NavMeshAgent가 활성화되지 않았습니다.");
+            return false;
+        }
 
-                // 마지막 방향으로 계속 회전
-                Rotate(_lastDirection == -1 ? -90 : 90);
-            }
+        // NavMesh 위에 에이전트가 있는지 확인
+        if (!_agent.isOnNavMesh)
+        {
+            Debug.LogWarning("NavMeshAgent가 NavMesh 위에 배치되지 않았습니다.");
+            return false;
+        }
 
-            else if (!isLeftBlocked)
-            {
-                _lastDirection = -1; // 방향 저장
-                Rotate(-90f);
-            }
-            else if (!isRightBlocked)
-            {
-                _lastDirection = 1; // 방향 저장
-                Rotate(90f);
-            }
-            else if (isLeftBlocked && isRightBlocked)
-            {
-                _lastDirection = 1;
-                Rotate(180f);
-            }
+
+        if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance && _agent.velocity.sqrMagnitude <= 0.005f)
+        {
+            return true; // 목적지 도착
+        }
+
+        return false; // 목적지 미도착
+
+    }
+
+    public void SetNavmeshEnable(bool value)
+    {
+        _agent.enabled = value;
+
+        if (!value)
+            _animator.SetFloat("Speed", 0);
+    }
+
+
+    private IEnumerator SearchRandomFloorPosRoutine()
+    {
+        float interval = 20;
+        while(true)
+        {
+            yield return new WaitForSeconds(interval * UnityEngine.Random.Range(0.1f, 1.5f));
+            _targetPos = _chapterManager.SearchRandomFloorPos();
+
+            if(_agent.enabled )
+                _agent.SetDestination(_targetPos);
         }
     }
 
+
+    private void OnTriggerEnter(Collider other)
+    {
+        OnTriggerEnterHandler?.Invoke(other);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        OnTriggerEixtHandler?.Invoke(other);
+    }
 
 
 

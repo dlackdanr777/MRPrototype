@@ -15,7 +15,7 @@ public class DogStateMachine
         _stateDic = new Dictionary<AnimalState, DogState> 
         {
             { AnimalState.Idle, new DogIdleState(_dog, this) },
-            { AnimalState.Sit, new DogSitState(_dog, this) },
+            { AnimalState.Touch, new DogSitState(_dog, this) },
             {AnimalState.TrackingObject, new DogTrackingGrabObjState(_dog, this) },
             {AnimalState.CollectObject, new DogCollectGrabObjState(_dog, this) },
         };

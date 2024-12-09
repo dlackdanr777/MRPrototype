@@ -5,12 +5,14 @@ public class FloorDetectManager : MonoBehaviour
 {
     [SerializeField] private Transform _detecterTr;
     [SerializeField] private LayerMask _targetLayer;
+    private MRUKRoom _room;
+
 
     public float GetFloorPosY()
     {
         Ray ray = new Ray(_detecterTr.position, Vector3.down);
 
-        if(Physics.Raycast(ray, out RaycastHit hit, 100, _targetLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, 100, _targetLayer))
         {
             return hit.point.y;
         }
@@ -20,4 +22,7 @@ public class FloorDetectManager : MonoBehaviour
             return -100000;
         }
     }
+
+
+
 }
