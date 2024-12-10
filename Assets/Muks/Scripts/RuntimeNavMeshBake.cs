@@ -1,4 +1,5 @@
 using Meta.XR.MRUtilityKit;
+using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.Events;
@@ -27,6 +28,15 @@ public class RuntimeNavMeshBake : MonoBehaviour
         floor.layer = LayerMask.NameToLayer("Floor");
         foreach(var child in floor.GetComponentsInChildren<Transform>())
             child.gameObject.layer = LayerMask.NameToLayer("Floor");
+
+        List<MRUKAnchor> walls = room.WallAnchors;
+
+        foreach(var wall in walls)
+        {
+            wall.gameObject.layer = LayerMask.NameToLayer("Wall");
+            foreach (var child in wall.GetComponentsInChildren<Transform>())
+                child.gameObject.layer = LayerMask.NameToLayer("Wall");
+        }
 
         _surface.BuildNavMesh();
         _createNaveMeshEvent?.Invoke();
