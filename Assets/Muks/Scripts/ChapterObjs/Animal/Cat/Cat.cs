@@ -17,11 +17,10 @@ public class Cat : MonoBehaviour, IChapterObject
     [SerializeField] private ChapterManager _chapterManager;
     [SerializeField] private Animator _animator;
     public Animator Animator => _animator;
+    [SerializeField] private AudioSource _audioSource;
 
-/*    [SerializeField] private HeadTracking _headTracking;
-    public HeadTracking HeadTracking => _headTracking;*/
-
-    [SerializeField] private float _speed;
+    /*    [SerializeField] private HeadTracking _headTracking;
+        public HeadTracking HeadTracking => _headTracking;*/
 
 
     private Coroutine _searchPosCoroutine;
@@ -142,6 +141,17 @@ public class Cat : MonoBehaviour, IChapterObject
 
         if (!value)
             _animator.SetFloat("Speed", 0);
+    }
+
+
+    public void PlayAudio()
+    {
+        _audioSource.Play();
+    }
+
+    public void StopAudio()
+    {
+        _audioSource.Stop();
     }
 
 

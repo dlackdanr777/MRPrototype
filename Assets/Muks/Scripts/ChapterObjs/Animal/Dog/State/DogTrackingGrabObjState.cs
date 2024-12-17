@@ -17,7 +17,7 @@ public class DogTrackingGrabObjState : DogState
         _dog.SetNavmeshEnable(true);
         _dog.HeadTracking.SetEnabled(true);
         _dog.HeadTracking.SetTarget(_dog.TargetGrabObj.transform);
-
+        _dog.PlayAudio();
         GrabGun.OnRecoveringObjectHandler += OnRecoveringObjectEvent;
     }
 

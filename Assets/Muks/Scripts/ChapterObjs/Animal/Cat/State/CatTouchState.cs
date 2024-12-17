@@ -12,12 +12,14 @@ public class CatTouchState : CatState
         //_cat.HeadTracking.SetTarget(_cat.HeadTarget);
         _cat.OnTriggerEnterHandler += OnTriggerEnterEvent;
         _cat.OnTriggerEixtHandler += OnTriggerExitEvent;
+        _cat.PlayAudio();
     }
 
     public override void OnExit()
     {
         _cat.OnTriggerEnterHandler -= OnTriggerEnterEvent;
         _cat.OnTriggerEixtHandler -= OnTriggerExitEvent;
+        _cat.StopAudio();
     }
 
     public override void OnUpdate()

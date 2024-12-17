@@ -30,6 +30,7 @@ public class Dog : MonoBehaviour, IChapterObject
     [SerializeField] private Transform _mouthTr;
     [SerializeField] private NavMeshAgent _agent;
     [SerializeField] private Animator _animator;
+    [SerializeField] private AudioSource _audioSource;
 
     [Space]
     [Header("Settings")]
@@ -57,6 +58,8 @@ public class Dog : MonoBehaviour, IChapterObject
     {
 
     }
+
+
 
     private void Start()
     {
@@ -162,6 +165,17 @@ public class Dog : MonoBehaviour, IChapterObject
 
         if (!value)
             _animator.SetFloat("Speed", 0);
+    }
+
+
+    public void PlayAudio()
+    {
+        _audioSource.Play();
+    }
+
+    public void StopAudio()
+    {
+        _audioSource.Stop();
     }
 
 
