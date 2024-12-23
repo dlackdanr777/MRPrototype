@@ -6,7 +6,6 @@ using UnityEngine.XR;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private ChapterManager _chapterManager;
-    [SerializeField] private Transform _objSpawnPos;
 
     private bool _rightAButtonPressed = false;
     private bool _rightBButtonPressed = false;
@@ -18,7 +17,7 @@ public class PlayerController : MonoBehaviour
         bool rightBButtonPressed = IsRightBButtonPressed();
         if(rightAButtonPressed && !_rightAButtonPressed)
         {
-            ResetGame();
+            ExitScene();
         }
 
         else if(rightBButtonPressed && !_rightBButtonPressed)
@@ -31,9 +30,9 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    private void ResetGame()
+    private void ExitScene()
     {
-        _chapterManager.ResetChapter();
+        LoadingSceneManager.LoadScene("ChapterChoiceScene");
     }
 
 

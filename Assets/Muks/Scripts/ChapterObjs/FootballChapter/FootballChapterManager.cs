@@ -11,15 +11,14 @@ public class FootballChapterManager : MonoBehaviour, IChapterObject
     [SerializeField] private TextMeshProUGUI _targetText;
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private ParticleSystem _touchParticle;
-    [SerializeField] private FootballHand[] _hands;
+    [SerializeField] private FootballHand _leftHand;
+    [SerializeField] private FootballHand _rightHand;
 
     [Space]
     [SerializeField] private AudioClip _touchSound;
 
 
     private FootballPlayerType _targetType;
-    public FootballPlayerType TargetType => _targetType;
-
     private int _score;
 
     public void Enabled(ChapterManager manager)
@@ -29,19 +28,17 @@ public class FootballChapterManager : MonoBehaviour, IChapterObject
         _canvas.transform.position = _cameraRig.centerEyeAnchor.transform.position + _cameraRig.centerEyeAnchor.transform.forward * 2;
         SetRandomTarget();
         _touchParticle.Stop();
-        for (int i = 0, cnt = _hands.Length; i< cnt; ++i)
-        {
-            _hands[i].OnTriggerEnterHandler += OnHandTriggerEnterEvnet;
-        }
+
+        _leftHand.OnTriggerEnterHandler += OnHandTriggerEnterEvnet;
+        _rightHand.OnTriggerEnterHandler += OnHandTriggerEnterEvnet;
     }
 
 
     public void Disabled(ChapterManager manager)
     {
-        for (int i = 0, cnt = _hands.Length; i < cnt; ++i)
-        {
-            _hands[i].RemoveAllTriggerEnterEvent();
-        }
+
+        _leftHand.RemoveAllTriggerEnterEvent();
+        _rightHand.RemoveAllTriggerEnterEvent();
     }
 
 
@@ -78,8 +75,6 @@ public class FootballChapterManager : MonoBehaviour, IChapterObject
 
     private void OnHandTriggerEnterEvnet(FootballPlayer footballPlayer)
     {
-        Debug.Log(footballPlayer.name);
-
         if (footballPlayer.Type != _targetType)
             return;
 
@@ -91,6 +86,7 @@ public class FootballChapterManager : MonoBehaviour, IChapterObject
         _audioSource.PlayOneShot(_touchSound);
         footballPlayer.ResetPos();
     }
+
 
     private void FixedUpdate()
     {

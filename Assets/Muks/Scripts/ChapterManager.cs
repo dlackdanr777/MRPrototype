@@ -108,12 +108,18 @@ public class ChapterManager : MonoBehaviour
 
     public void NextChapter()
     {
+        if (_chapterObjects.Length <= 0)
+            return;
+
         _index = (_index + 1) % _chapterObjects.Length;
         SetChapter(_index);
     }
 
     private void SetChapter(int index)
     {
+        if (_chapterObjects.Length <= 0)
+            return;
+
         _index = Mathf.Clamp(index, 0, _chapterObjects.Length - 1);
         for (int i = 0, cntI = _chapterObjects.Length; i < cntI; ++i)
         {
@@ -206,6 +212,28 @@ public class ChapterManager : MonoBehaviour
         var floorAnchor = _room.FloorAnchor;
         return _room.FloorAnchor.transform.position;
     }
+
+    public float GetFloorRotationY()
+    {
+        if (_room == null)
+            _room = FindAnyObjectByType<MRUKRoom>();
+
+        var floorAnchor = _room.FloorAnchor;
+
+        Quaternion referenceRotation = Quaternion.identity; // 수직 상태 기준 (또는 초기 회전값)
+        Quaternion currentRotation = floorAnchor.transform.rotation;
+
+        // 기준 회전과 현재 회전 간의 상대 회전 계산
+        Quaternion relativeRotation = Quaternion.Inverse(referenceRotation) * currentRotation;
+
+        // 상대 회전에서 Y축 회전 값 추출 (월드 기준)
+        float yRotationRelative = relativeRotation.eulerAngles.y;
+
+        // 결과 출력
+        Debug.Log("Relative Y Rotation: " + yRotationRelative);
+        return yRotationRelative;
+    }
+
 
     public Vector3 GetRandomCornerPos()
     {
