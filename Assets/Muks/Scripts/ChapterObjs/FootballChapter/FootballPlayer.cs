@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 
-public enum FootballPlayerType
+public enum GameColorType
 {
     Red,
     Yellow,
@@ -19,8 +19,8 @@ public class FootballPlayer : MonoBehaviour, IChapterObject
 {
 
     [Header("Option")]
-    [SerializeField] private FootballPlayerType _type;
-    public FootballPlayerType Type => _type;
+    [SerializeField] private GameColorType _type;
+    public GameColorType Type => _type;
 
 
     [Space]

@@ -1,14 +1,24 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.XR;
 
 public class SprayPainter : MonoBehaviour, IChapterObject
 {
     [Header("Components")]
+    [SerializeField] private Transform _cursor;
     [SerializeField] private Transform _sprayStartTr; // 레이를 쏠 기준 Transform
     [SerializeField] private ParticleSystem _sprayParticle;
     [SerializeField] private AudioSource _audio;
     [SerializeField] private Animator _animator;
     [SerializeField] private Material _baseMaterial; // 기본 머티리얼 (원본)
+
+
+    [Space]
+    [Header("UI")]
+    [SerializeField] private Image _colorImage;
+   
+    [SerializeField] private TextMeshProUGUI _sizeText;
 
     [Space]
     [Header("Options")]
@@ -16,6 +26,8 @@ public class SprayPainter : MonoBehaviour, IChapterObject
     [SerializeField] private float _maxDistance = 10f; // Raycast 최대 거리
     [SerializeField] private Color _sprayColor = Color.red; // 스프레이 색상
     [SerializeField] private float _brushSize = 0.1f; // 브러시 크기
+    [SerializeField] private float _minBrushSize = 0.05f;
+    [SerializeField] private float _maxBrushSize = 1f;
 
     private Material _instanceMaterial; // 인스턴스화된 머티리얼
     private bool _wasTriggerPressed;
@@ -31,6 +43,7 @@ public class SprayPainter : MonoBehaviour, IChapterObject
 
         // 초기 색상 설정
         ChangePaintColor(_sprayColor);
+        _sizeText.SetText(Mathf.FloorToInt(_brushSize * 100).ToString());
     }
 
     public void Disabled(ChapterManager manager)
@@ -47,14 +60,20 @@ public class SprayPainter : MonoBehaviour, IChapterObject
         _audio.Stop();
         //_animator.SetBool("Press", false);
         _wasTriggerPressed = false;
-
-        // 활성화 시 색상을 재설정
-        ChangePaintColor(_sprayColor);
     }
+
+
+    public void ChangeBrushSize(float addValue)
+    {
+        _brushSize = Mathf.Clamp(_brushSize + addValue, _minBrushSize, _maxBrushSize);
+        _sizeText.SetText(Mathf.FloorToInt(_brushSize * 100).ToString());
+    }
+
 
     public void ChangePaintColor(Color newColor)
     {
         _sprayColor = newColor;
+        _colorImage.color = newColor;
 
         // 새로 생성된 머티리얼의 색상 변경
         if (_instanceMaterial != null)
@@ -88,9 +107,12 @@ public class SprayPainter : MonoBehaviour, IChapterObject
     {
         bool isTriggerPressed = IsTriggerPressed();
 
+        Ray ray = new Ray(_sprayStartTr.position, _sprayStartTr.forward);
+        UpdateCursor(ray);
+
         if (isTriggerPressed)
         {
-            Ray ray = new Ray(_sprayStartTr.position, _sprayStartTr.forward);
+
             StartPainting(ray);
         }
 
@@ -109,6 +131,20 @@ public class SprayPainter : MonoBehaviour, IChapterObject
 
         _wasTriggerPressed = isTriggerPressed;
     }
+
+
+    private void UpdateCursor(Ray ray)
+    {
+        if (Physics.Raycast(ray, out RaycastHit hit, _maxDistance, _layerMask))
+        {
+            // 충돌한 위치에서 내쪽 방향으로 0.01만큼 이동
+            Vector3 directionToPull = (ray.origin - hit.point).normalized; // 레이의 시작점에서 타겟까지의 방향
+            _cursor.transform.position = hit.point + directionToPull * 0.02f; // 타겟 위치에서 0.01만큼 이동
+            return;
+        }
+        _cursor.transform.position = ray.origin + ray.direction.normalized * _maxDistance;
+    }
+
 
     private void StartPainting(Ray ray)
     {

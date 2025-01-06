@@ -18,7 +18,7 @@ public class FootballChapterManager : MonoBehaviour, IChapterObject
     [SerializeField] private AudioClip _touchSound;
 
 
-    private FootballPlayerType _targetType;
+    private GameColorType _targetType;
     private int _score;
 
     public void Enabled(ChapterManager manager)
@@ -44,28 +44,28 @@ public class FootballChapterManager : MonoBehaviour, IChapterObject
 
     public void SetRandomTarget()
     {
-        _targetType = (FootballPlayerType)Random.Range(0, (int)FootballPlayerType.Length);
+        _targetType = (GameColorType)Random.Range(0, (int)GameColorType.Length);
         _targetText.text = "Target: ";
 
         switch(_targetType)
         {
-            case FootballPlayerType.Red:
+            case GameColorType.Red:
                 _targetText.text += Utility.SetStringColor("Red", Color.red);
                 break;
 
-            case FootballPlayerType.Yellow:
+            case GameColorType.Yellow:
                 _targetText.text += Utility.SetStringColor("Yellow", Color.yellow);
                 break;
 
-            case FootballPlayerType.White:
+            case GameColorType.White:
                 _targetText.text += Utility.SetStringColor("White", Color.white);
                 break;
 
-            case FootballPlayerType.Black:
+            case GameColorType.Black:
                 _targetText.text += Utility.SetStringColor("Black", Color.black);
                 break;
 
-            case FootballPlayerType.Purple:
+            case GameColorType.Purple:
                 _targetText.text += Utility.SetStringColor("Purple", Color.magenta);
                 break;
         }
