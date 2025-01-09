@@ -4,21 +4,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-public enum Chapter
-{
-    Chapter1,
-    Chapter2,
-}
-
-public enum SpawnPositionType
-{
-    Center,
-    CameraForward,
-    Corner,
-    Random,
-    None,
-}
-
 [Serializable]
 public class ChapterObjectData
 {
@@ -66,7 +51,10 @@ public class ChapterManager : MonoBehaviour
     [SerializeField] private Transform _spawnPos;
     [SerializeField] private ChapterData[] _chapterObjects;
 
-    private Chapter _chapter;
+
+    public int ChapterLength => _chapterObjects.Length;
+    public int CurrentChapter => _index;
+
     private MRUKRoom _room;
     private int _index;
 

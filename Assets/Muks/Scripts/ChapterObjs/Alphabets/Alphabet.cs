@@ -7,7 +7,7 @@ public class Alphabet : MonoBehaviour, IChapterObject
 
 
     [Header("Audios")]
-    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioController _audioController;
     [SerializeField] private AudioClip _clickAudio;
 
     private GameObject _currentAnimeObj;
@@ -29,8 +29,8 @@ public class Alphabet : MonoBehaviour, IChapterObject
 
     public void Disabled(ChapterManager manager)
     {
-        _audioSource.Stop();
-    }
+        _audioController.Stop();
+    } 
 
     private void Awake()
     {
@@ -53,9 +53,8 @@ public class Alphabet : MonoBehaviour, IChapterObject
         _currentAnimeObj = Instantiate(animeObj, transform.position + transform.forward * 2, rot, transform);
         _currentAnimeObj.transform.localScale = Vector3.one * 1.5f;
 
-        _audioSource.Stop();
-        _audioSource.PlayOneShot(_clickAudio);
-        _audioSource.clip = clip;
-        _audioSource.Play();
+        _audioController.Stop();
+        _audioController.PlayOneShot(_clickAudio);
+        _audioController.Play(clip, 0.5f);
     }
 }
