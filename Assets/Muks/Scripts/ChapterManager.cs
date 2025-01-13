@@ -127,6 +127,17 @@ public class ChapterManager : MonoBehaviour
         }
     }
 
+    public MRUKRoom GetRoom()
+    {
+        if (_room == null)
+            _room = FindAnyObjectByType<MRUKRoom>();
+
+        if (_room == null)
+            throw new Exception("아직 방 데이터가 생성되지 않았습니다.");
+
+        return _room;
+    }
+
 
     public Vector3 GetRandomFloorPos()
     {

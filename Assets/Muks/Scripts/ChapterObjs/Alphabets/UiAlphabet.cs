@@ -1,19 +1,31 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.XR;
 
 public class UiAlphabet : MonoBehaviour
 {
     [SerializeField] private Transform _player;
     [SerializeField] private ChapterManager _chapterManager;
+    [SerializeField] private AudioController _audioController;
+    [SerializeField] private AudioClip _buttonSound;
+    [SerializeField] private AudioClip _uiSound;
 
     [SerializeField] private RectTransform _slotParent;
     [SerializeField] private UIAlphabetSlot _slotPrefab;
 
 
+    public OVRRayHelper RayHelper;
+    public OVRInputModule InputModule;
+    public OVRRaycaster Raycaster;
+    public OVRGazePointer GazePointer;
+    public OVRCameraRig _cameraRig;
+
     private List<UIAlphabetSlot> _slotList;
+    private OVRControllerHelper _rightControllerHelper;
+    private OVRControllerHelper _leftControllerHelper;
+
     private int _currentIndex;
-    private bool _xButtonPressed = false;
     private bool _yButtonPressed = false;
     private bool _joystickLeftMoved= false;
     private bool _joystickRightMoved = false;
@@ -25,47 +37,23 @@ public class UiAlphabet : MonoBehaviour
         for(int i = 0, cnt = _chapterManager.ChapterLength; i < cnt; i++)
         {
             char alphabet = (char)('A' + i);
-
+            int index = i;
             UIAlphabetSlot slot = Instantiate(_slotPrefab, _slotParent);
-            slot.Init();
+            slot.Init(() => OnButtonClicked(index));
             slot.SetText(alphabet.ToString());
             slot.SetOutline(false);
             _slotList.Add(slot);
         }
 
+        SetupInteractionDependencies();
         Hide();
     }
 
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            if (!_slotParent.gameObject.activeSelf)
-            {
-                Show();
-                return;
-            }
-
-            else
-            {
-                Debug.Log("½ÇÇà");
-                SelectChapter();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            ChangeIndex(-1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            ChangeIndex(1);
-        }
-
         ButtonControll();
-        JoystickControll();
+        //JoystickControll();
     }
 
 
@@ -75,6 +63,8 @@ public class UiAlphabet : MonoBehaviour
             return;
 
         _slotParent.gameObject.SetActive(true);
+        _leftControllerHelper.RayHelper.Renderer.enabled = true;
+        _rightControllerHelper.RayHelper.Renderer.enabled = true;
         Vector3 playerPosition = _player.transform.position;
         Vector3 forwardDirection = _player.transform.forward;
         Vector3 targetPosition = new Vector3(playerPosition.x + forwardDirection.x * 2.5f, _player.transform.position.y, playerPosition.z + forwardDirection.z * 2.5f);
@@ -93,21 +83,18 @@ public class UiAlphabet : MonoBehaviour
         if (!_slotParent.gameObject.activeSelf)
             return;
 
+        _leftControllerHelper.RayHelper.Renderer.enabled = false;
+        _rightControllerHelper.RayHelper.Renderer.enabled = false;
         _slotParent.gameObject.SetActive(false);
     }
 
 
     private void ButtonControll()
     {
-        bool xButtonPressed = IsLeftXButtonPressed();
         bool yButtonPressed = IsLeftYButtonPressed();
-        if (xButtonPressed && !_xButtonPressed)
+        if (yButtonPressed && !_yButtonPressed)
         {
-            Hide();
-        }
-
-        else if (yButtonPressed && !_yButtonPressed)
-        {
+            _audioController.PlayOneShot(_uiSound);
             if (!_slotParent.gameObject.activeSelf)
             {
                 Show();
@@ -115,11 +102,9 @@ public class UiAlphabet : MonoBehaviour
 
             else
             {
-                SelectChapter();
+                Hide();
             }
         }
-
-        _xButtonPressed = xButtonPressed;
         _yButtonPressed = yButtonPressed;
     }
 
@@ -141,11 +126,6 @@ public class UiAlphabet : MonoBehaviour
 
         _joystickLeftMoved = joystickLeftMoved;
         _joystickRightMoved = joystickRightMoved;
-    }
-
-    private void SelectChapter()
-    {
-        _chapterManager.StartChapter(_currentIndex);
     }
 
 
@@ -224,5 +204,52 @@ public class UiAlphabet : MonoBehaviour
         }
 
         return false;
+    }
+
+
+    private void SetupInteractionDependencies()
+    {
+        if (!_cameraRig)
+            return;
+
+        GazePointer.rayTransform = _cameraRig.centerEyeAnchor;
+        InputModule.rayTransform = _cameraRig.rightControllerAnchor;
+        Raycaster.pointer = _cameraRig.rightControllerAnchor.gameObject;
+
+        if (_cameraRig.GetComponentsInChildren<OVRRayHelper>(false).Length > 0)
+            return;
+
+        _rightControllerHelper = _cameraRig.rightControllerAnchor.GetComponentInChildren<OVRControllerHelper>();
+        if (_rightControllerHelper)
+        {
+            _rightControllerHelper.RayHelper =
+                Instantiate(RayHelper, Vector3.zero, Quaternion.identity, _rightControllerHelper.transform);
+            _rightControllerHelper.RayHelper.gameObject.SetActive(true);
+        }
+
+        _leftControllerHelper =
+            _cameraRig.leftControllerAnchor.GetComponentInChildren<OVRControllerHelper>();
+        if (_leftControllerHelper)
+        {
+            _leftControllerHelper.RayHelper =
+                Instantiate(RayHelper, Vector3.zero, Quaternion.identity, _leftControllerHelper.transform);
+            _leftControllerHelper.RayHelper.gameObject.SetActive(true);
+        }
+
+        var hands = _cameraRig.GetComponentsInChildren<OVRHand>();
+        foreach (var hand in hands)
+        {
+            hand.RayHelper =
+                Instantiate(RayHelper, Vector3.zero, Quaternion.identity, _cameraRig.trackingSpace);
+            hand.RayHelper.gameObject.SetActive(true);
+        }
+    }
+
+
+    private void OnButtonClicked(int index)
+    {
+        _chapterManager.StartChapter(index);
+        _audioController.PlayOneShot(_buttonSound);
+        Hide();
     }
 }

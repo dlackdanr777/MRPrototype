@@ -17,9 +17,10 @@ public class Alphabet : MonoBehaviour, IChapterObject
         if (_currentAnimeObj != null)
             Destroy(_currentAnimeObj);
 
-        Vector3 pos = _player.transform.position + _player.transform.forward;
-        pos.y = manager.GetFloorCenterPos().y;
-        transform.position = pos;
+        Vector3 playerPosition = _player.transform.position;
+        Vector3 forwardDirection = _player.transform.forward;
+        Vector3 targetPosition = new Vector3(playerPosition.x + forwardDirection.x * 0.7f, manager.GetFloorCenterPos().y, playerPosition.z + forwardDirection.z * 0.7f);
+        transform.position = targetPosition;
 
         Vector3 dir = (transform.position - _player.transform.position).normalized;
         float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
